@@ -1,8 +1,8 @@
 const zod = require("zod");
 
 const userSignupValidation = zod.object({
-  firstName: zod.string().maxLength(30),
-  lastName: zod.string().maxLength(30),
+  firstName: zod.string().max(30),
+  lastName: zod.string().max(30),
   email: zod.string().email(),
   password: zod.string().min(6),
   age: zod.number().min(18),

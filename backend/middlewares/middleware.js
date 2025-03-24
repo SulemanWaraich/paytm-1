@@ -8,14 +8,14 @@ const authMiddleware = (req, res, next) => {
   }
   const word = token.split(" ");
   const jwtToken = word[1];
-
+  
   try {
     const decodedJwt = jwt.verify(jwtToken, JWT_SECRET);
-    if(decodedJwt){
-      return res.status(403);
+    if(!decodedJwt){
+      return res.status(403).json({msg: "invalid token"});
     }
 
-    decodedJwt.userId
+    req.userId = decodedJwt.userId    
     next();
   } catch (error) {
     res.status(401).json({msg: "input the right credentials"});

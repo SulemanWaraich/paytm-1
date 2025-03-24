@@ -23,7 +23,7 @@ userRouter.post('/signup', async (req, res) => {
   // const {firstName, lastName, email, password, age} = validationResult.data;
   
   try {
-    const existingUser = User.findOne({email: userName, password: userPassword});
+    const existingUser = await User.findOne({email: userName, password: userPassword});
     if(existingUser){
       return res.json({msg: "user already exist"})
     }
@@ -35,7 +35,7 @@ userRouter.post('/signup', async (req, res) => {
 
     await Account.create({userId: user._id, balance: Math.random() + 1 * 1000});
 
-    res.json({msg: "User created successfully!", token: jwtToken});
+    res.json({msg: "User created successfully!"});
 
   } catch (error) {
     res.status(500).send("some db error.");
@@ -79,7 +79,7 @@ userRouter.put('/update', authMiddleware, async (req, res) => {
   try {
     const user = await User.updateOne({_id: req.userId}, req.body);
     
-    if(!user){
+    if(!req.userId || user.matchedCount === 0){
       return res.status(403).json({msg: "user doesn't exist, enter the right credentials"});
     }
     res.json({msg: "user updated successfully"});
@@ -90,9 +90,16 @@ userRouter.put('/update', authMiddleware, async (req, res) => {
 })
 
 userRouter.get('/bulk', async (req, res) => {
-  const friend = req.params.filter || "";
+  const friend = req.query.name || "";
+  console.log(friend);
 
   const users = await User.find({$or: [{firstName: {"$regex": friend}}, {lastName: {"$regex": friend}}]})
+
+  console.log(users);
+  
+  if(users == (Array.length === 0)){
+    return res.status(401).json({msg: "no matches found"})
+  }
 
   res.json({user: users.map(user => ({
     username: user.userName, 
