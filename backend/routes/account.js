@@ -7,9 +7,9 @@ const accRouter = express.Router();
 
 accRouter.get('/balance', authMiddleware, async (req, res) => {
   const userId = req.userId;
-
-  const acc = await Account.findById({userId: userId});
-
+  // console.log(typeof userId, typeof new mongoose.Types.ObjectId(userId)); 
+  const acc = await Account.findOne({userId: userId});
+  // console.log(acc.balance);
   res.json({balance: acc.balance});
 })
 
@@ -20,13 +20,16 @@ accRouter.post('/transfer', authMiddleware, async (req, res) => {
     session.startTransaction();
     const {to, amount} = req.body;
   
-    const fromAccount = await Account.findById({userId: req.userId}).session(session);
+    // const fromAccount = await Account.findById(req.userId).session(session);
+    const fromAccount = await Account.findOne({userId: req.userId}).session(session);
+    console.log(fromAccount.balance, req.userId);
+    
     if(!fromAccount || fromAccount.balance < amount){
       await session.abortTransaction();
       return res.status(401).json({msg: "insufficient balance"});    
     }
   
-    const toAccount = await Account.findById({userId: to}).session(session);
+    const toAccount = await Account.findOne({userId: to}).session(session);
     if(!toAccount){
       await session.abortTransaction();
       return res.status(401).json({msg: "invalid account"});
