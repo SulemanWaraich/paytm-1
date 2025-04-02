@@ -10,14 +10,14 @@ const userRouter = express.Router();
 userRouter.post('/signup', async (req, res) => {
   const validationResult = userSignupValidation.safeParse(req.body);  
   if(!validationResult.success){
-    res.status(404).json({errors: validationResult.error.errors})
+    return res.status(404).json({errors: validationResult.error.errors})
   }
   
   const userFirstName = req.body.firstName;
   const userLastName = req.body.lastName;
   const userName = req.body.email;
   const userPassword = req.body.password;
-  const userAge = req.body.age;
+  // const userAge = req.body.age;
   
   // second method of getting data from req it's called obj destructuring
   // const {firstName, lastName, email, password, age} = validationResult.data;
@@ -27,18 +27,23 @@ userRouter.post('/signup', async (req, res) => {
     if(existingUser){
       return res.json({msg: "user already exist"})
     }
-    
-    const user = await User.create({firstName: userFirstName, lastName: userLastName, email: userName, password: userPassword, age: userAge});
 
+    console.log(existingUser);
+    
+    
+    const user = await User.create({firstName: userFirstName, lastName: userLastName, email: userName, password: userPassword});
+
+    console.log(user);
+    
     const userId = user._id;
     const jwtToken = jwt.sign({userId}, JWT_SECRET);
 
     await Account.create({userId: user._id, balance: 1 + Math.random() * 1000});
 
-    res.json({msg: "User created successfully!"});
+    res.json({msg: "User created successfully!", jwtToken});
 
   } catch (error) {
-    res.status(500).send("some db error.");
+    res.status(500).json({msg: error});
   }
   
 });

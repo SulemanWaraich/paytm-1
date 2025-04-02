@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Heading from '../components/Heading';
 import NavBar from '../components/NavBar';
 import InputBox from '../components/InputBox';
 
 function Dashboard() {
+  const [users, setUsers] = useState(['Suleman', 'Ashfaque', 'Usama']);
+
   return (
     <div>
       <NavBar />
@@ -13,10 +15,9 @@ function Dashboard() {
       <InputBox name={'Users'} place={'Search users...'}/>
 
       <div>
-        <ul className='pt-4 space-y-4'>
-          <li><button className='border rounded-full bg-slate-200 border-slate-100 px-2 '>S</button> User 1</li>
-          <li><button className='border rounded-full bg-slate-200 border-slate-100 px-2 '>S</button> User 2</li>
-          <li><button className='border rounded-full bg-slate-200 border-slate-100 px-2 '>S</button> User 3</li>
+        <ul className='pt-6 space-y-6 text-2xl'>
+        {users.map((user) => {
+          return <li> <button className='border rounded-full bg-slate-200 border-slate-100 px-2 mx-2 font-semibold'>{user[0]}</button>{user}</li>})}
         </ul>
       </div>
       </div>
